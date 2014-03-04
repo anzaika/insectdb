@@ -16,9 +16,6 @@ gem 'jbuilder', '~> 2.0'
 
 gem 'sdoc', '~> 0.4.0',          group: :doc
 
-gem 'bio'
-gem 'parallel'
-
 gem 'capistrano', '~> 3.0.1'
 gem 'capistrano-rails', '~> 1.1.0'
 gem 'capistrano-bundler'
@@ -31,4 +28,11 @@ group :development do
   gem 'spring'
 end
 
+group :test do
+  gem 'rspec'
+  gem 'rspec-rails'
+end
 
+gem 'bio'
+gem 'parallel'
+gem 'sidekiq'
