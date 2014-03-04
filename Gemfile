@@ -21,17 +21,17 @@ gem 'capistrano-rails', '~> 1.1.0'
 gem 'capistrano-bundler'
 gem 'capistrano-rbenv', '~> 2.0'
 
-group :development do
+group :development, :test do
   gem 'map_by_method'
   gem 'what_methods'
   gem 'irbtools'
   gem 'spring'
-end
-
-group :test do
+  gem 'spring-commands-rspec'
   gem 'rspec'
   gem 'rspec-rails'
+  gem 'guard-rspec', require: false
 end
+
 
 gem 'bio'
 gem 'parallel'
