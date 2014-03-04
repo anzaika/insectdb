@@ -1,4 +1,5 @@
 class Div < ActiveRecord::Base
+  include Constants
 
   serialize :alleles
 
@@ -27,7 +28,7 @@ class Div < ActiveRecord::Base
   def self.from_hash( ref, chr, pos )
 
     self.create!(
-      :chromosome => Insectdb::CHROMOSOMES[chr],
+      :chromosome => CHROMOSOMES[chr],
       :position   => pos,
       :alleles    => ref
     )

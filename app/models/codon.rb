@@ -1,4 +1,5 @@
 class Codon
+  include Constants
 
   attr_reader :codon
 

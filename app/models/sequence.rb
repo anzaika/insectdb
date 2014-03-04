@@ -1,5 +1,6 @@
 class Sequence
-attr_reader :seq, :strand
+  include Constants
+  attr_reader :seq, :strand
 
   # Public
   #

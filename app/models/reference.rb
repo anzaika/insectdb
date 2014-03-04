@@ -1,4 +1,5 @@
 class Reference < ActiveRecord::Base
+  include Constants
   self.table_name = 'reference'
 
   validates :chromosome,

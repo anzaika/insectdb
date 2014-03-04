@@ -1,4 +1,5 @@
 class Segment < ActiveRecord::Base
+  include Constants
 
   serialize :_ref_seq
 

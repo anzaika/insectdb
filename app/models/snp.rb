@@ -1,4 +1,5 @@
 class Snp < ActiveRecord::Base
+  include Constants
   serialize :alleles
 
   validates :chromosome,
