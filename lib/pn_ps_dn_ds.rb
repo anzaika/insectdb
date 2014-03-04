@@ -1,4 +1,3 @@
-module Insectdb::Tests
 module PnPsDnDs
 
   def self.compute_pnps_for_segment_scope( scope: 'alt' )
@@ -14,5 +13,4 @@ module PnPsDnDs
     end
   end
 
-end
 end
