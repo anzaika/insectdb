@@ -30,6 +30,8 @@ group :development, :test do
   gem 'rspec'
   gem 'rspec-rails'
   gem 'guard-rspec', require: false
+  gem 'fabrication'
+  gem 'ruby-prof'
 end
 
 

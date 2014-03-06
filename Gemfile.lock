@@ -72,6 +72,7 @@ GEM
     erubis (2.7.0)
     every_day_irb (1.6.1)
     execjs (2.0.2)
+    fabrication (2.9.8)
     fancy_irb (0.7.3)
       paint (>= 0.8.1)
       unicode-display_width (>= 0.1.1)
@@ -202,6 +203,7 @@ GEM
       rspec-core (~> 2.14.0)
       rspec-expectations (~> 2.14.0)
       rspec-mocks (~> 2.14.0)
+    ruby-prof (0.14.2)
     ruby_engine (1.0.1)
     ruby_info (1.0.1)
     ruby_version (1.0.1)
@@ -278,6 +280,7 @@ DEPENDENCIES
   capistrano-rails (~> 1.1.0)
   capistrano-rbenv (~> 2.0)
   coffee-rails (~> 4.0.0)
+  fabrication
   guard-rspec
   haml
   irbtools
@@ -289,6 +292,7 @@ DEPENDENCIES
   rails (= 4.1.0.rc1)
   rspec
   rspec-rails
+  ruby-prof
   sass-rails (~> 4.0.1)
   sdoc (~> 0.4.0)
   sidekiq
