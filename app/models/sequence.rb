@@ -68,7 +68,7 @@ class Sequence
 
     range = csp..(csp+2)
 
-    Codon.new( @seq[range] )
+    Codon.new( codon: @seq[range] )
 
   end
 
@@ -78,7 +78,7 @@ class Sequence
     return [] if length < 3
 
     @seq.each_slice(3)
-        .map { |c| c.size == 3 ? Codon.new(c) : nil }
+        .map { |c| c.size == 3 ? Codon.new(codon: c) : nil }
         .compact
 
   end
@@ -105,6 +105,14 @@ class Sequence
 
     nuc_seq[0..5].join.to_s + '...' + nuc_seq[-6..-1].join.to_s
 
+  end
+
+  def start
+    @seq[0][0]
+  end
+
+  def stop
+    @seq[-1][0]
   end
 
 end

@@ -103,7 +103,7 @@ class Codon
   # codon - The Array of this structure: [[1,'A'],[2,'G'],[3,'C']]
   #
   # Returns The Codon object.
-  def initialize( codon )
+  def initialize( codon: codon )
     if (codon.class != Array) ||
        (codon.size != 3)
       raise ArgumentError,
@@ -200,7 +200,7 @@ class Codon
     new_codon = @codon.clone
     new_codon[ind] = [mutation.pos, new_nuc]
 
-    Codon.new(new_codon)
+    Codon.new(codon: new_codon)
 
   end
 

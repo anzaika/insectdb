@@ -25,12 +25,10 @@ class Segment < ActiveRecord::Base
             :presence => true,
             :numericality => { :only_integer => true }
 
-  validates :length,
-            :presence => true,
-            :numericality => { :only_integer => true }
-
   validates :type,
             :presence => true
+
+  before_save :set_length
 
   # Public: A wrapper around Segment::create! to make it create a record
   #         with custom id.
@@ -180,6 +178,12 @@ class Segment < ActiveRecord::Base
   def gc
     s = codons.map { |c| c.nuc_codon[2] }.join
     ((s.count('G')+s.count('C')).to_f/codons.count).round(4)
+  end
+
+  private
+
+  def set_length
+    self.length = stop - start
   end
 
 
