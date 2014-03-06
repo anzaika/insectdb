@@ -3,34 +3,41 @@ class Routine
 
   def initialize( segment: segment, method: 'leushkin')
 
-    @snps    = segment.snps.map(&:to_mutation)
-    @divs    = segment.divs.map(&:to_mutation)
+    @segment = segment
     @codons  = segment.codons
     @method  = method
 
   end
 
   def pn_ps
-    return {:syn => 0.0, :nonsyn => 0.0} if @codons.empty? || @snps.empty?
-    mut_map(muts: @snps).map{ |s| mutcount(struct: s) }
+    return {:syn => 0.0, :nonsyn => 0.0} if @codons.empty? || snps.empty?
+    mut_map(muts: snps).map{ |s| mutcount(struct: s) }
                         .reduce{ |one, two| one.merge(two){ |k,v1,v2| v1+v2 } }
   end
 
   def dn_ds
-    return {:syn => 0.0, :nonsyn => 0.0} if @codons.empty? || @divs.empty?
-    mut_map(muts: @divs).map{ |s| mutcount(struct: s) }
+    return {:syn => 0.0, :nonsyn => 0.0} if @codons.empty? || divs.empty?
+    mut_map(muts: divs).map{ |s| mutcount(struct: s) }
                         .reduce{ |one, two| one.merge(two){ |k,v1,v2| v1+v2 } }
   end
 
   ### Private ###
 
-  def mutcount( struct: struct )
-    MutationCount.const_get(@method.capitalize)
-                           .process(codon:     struct.codon,
-                                    mutations: struct.mutations)
+  def snps
+    @snps ||= @segment.snps.map(&:to_mutation)
   end
 
-  # Creates an array with OpesStructs. Struct is comprised of a codon
+  def divs
+    @divs ||= @segment.divs.map(&:to_mutation)
+  end
+
+  def mutcount( struct: struct )
+    MutationCount
+      .const_get(@method.capitalize)
+      .process(codon: struct.codon, mutations: struct.mutations)
+  end
+
+  # Creates an array with OpenStructs. Struct is comprised of a codon
   # and mutations associated with it. Only Structs with more than zero mutations
   # find its way into the resulting array.
   def mut_map( muts: muts)

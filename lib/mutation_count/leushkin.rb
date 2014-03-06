@@ -13,7 +13,7 @@ module Leushkin
 
   end
 
-  def self.get_mutation_relative_position( codon: codon, mutation: mutation )
+  def self.mut_position( codon: codon, mutation: mutation )
     codon.pos_codon
          .index(mutation.pos)
   end
@@ -24,7 +24,7 @@ module Leushkin
       return ZERO
     end
 
-    case sitemap[self.get_mutation_relative_position(codon: codon, mutation: mutation)]
+    case sitemap[self.mut_position(codon: codon, mutation: mutation)]
     when 'u'
       ZERO
     when 's'
