@@ -4,7 +4,7 @@ module Insectdb
 
     result = {}
 
-    Insectdb::CHROMOSOMES.each do |name, val|
+    CHROMOSOMES.each do |name, val|
       puts "Processing " + name.to_s + " chromosome"
       result[name] = block.call(name, val)
     end
