@@ -50,7 +50,7 @@ class Segment < ActiveRecord::Base
   def self.___create!( params )
     Insectdb::Segment.create! do |r|
       r.id         = params[:id].to_i
-      r.chromosome = Insectdb::CHROMOSOMES[params[:chromosome]]
+      r.chromosome = CHROMOSOMES[params[:chromosome]]
       r.start      = params[:start].to_i
       r.stop       = params[:stop].to_i
       r.type       = params[:type]

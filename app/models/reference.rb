@@ -43,7 +43,7 @@ class Reference < ActiveRecord::Base
   # Returns Insectdb::Reference object
   def self.from_hash( hash, chr, pos )
     self.create!(
-      :chromosome => Insectdb::CHROMOSOMES[chr],
+      :chromosome => CHROMOSOMES[chr],
       :position => pos,
       :dmel => hash[:dmel],
       :dsim => hash[:dsim],

@@ -34,7 +34,7 @@ class Mrna < ActiveRecord::Base
 
     Insectdb::Mrna.create! do |r|
       r.id         = params[:id].to_i
-      r.chromosome = Insectdb::CHROMOSOMES[params[:chromosome]]
+      r.chromosome = CHROMOSOMES[params[:chromosome]]
       r.strand     = params[:strand]
       r.start      = params[:start].to_i
       r.stop       = params[:stop].to_i
@@ -86,7 +86,7 @@ class Mrna < ActiveRecord::Base
   # Returns nothing.
   def self.set_ref_seq
 
-    Insectdb.peach(Insectdb::CHROMOSOMES.values, 5) do |chr|
+    Insectdb.peach(CHROMOSOMES.values, 5) do |chr|
 
       Mrna.where(:chromosome => chr).each(&:ref_seq)
 

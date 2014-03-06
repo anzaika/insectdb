@@ -40,7 +40,7 @@ class Snp < ActiveRecord::Base
                  .inject(Hash.new(0)) { |mem, var| mem[var]+=1; mem }
 
     self.create!(
-      :chromosome => Insectdb::CHROMOSOMES[chr],
+      :chromosome => CHROMOSOMES[chr],
       :position   => pos,
       :sig_count  => col.select { |n| n != 'N' }.size,
       :alleles    => alleles,
