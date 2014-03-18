@@ -35,18 +35,29 @@ class Snp < ActiveRecord::Base
   #   )
   #
   # Returns the Insectdb::Snp object.
-  def self.from_col( ref, col, chr, pos )
-    alleles = col.select{ |n| n != 'N'}
-                 .inject(Hash.new(0)) { |mem, var| mem[var]+=1; mem }
+  def self.from_col(ref: reference,
+                    poly: poly,
+                    chr: chr,
+                    pos: pos)
+
+    poly_sig = poly.select{|n| n!='N'}
+    allele_freqs = poly_sig.inject(Hash.new(0)){|mem, var| mem[var]+=1; mem}
 
     self.create!(
       :chromosome => CHROMOSOMES[chr],
       :position   => pos,
-      :sig_count  => col.select { |n| n != 'N' }.size,
-      :alleles    => alleles,
-      :aaf        => ((alleles[ref[:dmel]])/
-                      (alleles.values.reduce(:+)).to_f).round
+      :sig_count  => poly_sig.count,
+      :alleles    => allele_freqs,
+      :aaf        => self.aaf_from(allele_freqs, ref)
     )
+  end
+
+  # Public: Compute ancestral allele frequency (aaf)
+  def self.aaf_from(freqs, ref)
+    dmel_count = freqs[ref[:dmel]].to_f
+    all_count  = freqs.values.reduce(:+)
+
+    (dmel_count/all_count).round(3)
   end
 
   # Public: When parsing 163 aligned Drosophila melanogaster sequences column

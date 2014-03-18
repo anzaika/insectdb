@@ -8,9 +8,9 @@ class CreateSnps < ActiveRecord::Migration
       t.text    :alleles
     end
 
-    add_index :snps,
-              [:chromosome, :position, :sig_count],
-              :name => 'snps__chr_sigcount_pos'
+    # add_index :snps,
+    #           [:chromosome, :position, :sig_count],
+    #           :name => 'snps__chr_sigcount_pos'
   end
 
   def down

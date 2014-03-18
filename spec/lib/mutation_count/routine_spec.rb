@@ -1,51 +1,75 @@
 require 'spec_helper'
 
 describe MutationCount::Routine do
+describe '.pn_ps' do
 
-  describe '#pn_ps' do
-    it 'returns a hash' do
-      MutationCount::Routine.new(
-        segment: Fabricate(:segment)
-      ).pn_ps.class.should == Hash
-    end
-    context 'with Leushkin method' do
-      context 'for segment with sequence ATG and mutation at second base' do
-        it 'returns {syn: 0.0, nonsyn: 1.0}' do
-          seg = Fabricate(:segment) do
-            _ref_seq Sequence.new([[1,'A'], [2,'T'], [3,'G']])
-          end
+  context 'with Leushkin method' do
 
-          snp = Fabricate(:snp) do
-            position 2
-          end
-
-          seg.stub(:snps).and_return([snp])
+    context 'for segment with sequence ATGGCC starting at 3' do
+      context 'with snps TC at 4 and CG at 7' do
+        it 'returns {syn: 0.0, nonsyn: 2.0}' do
+          seq = build(:sequence, start: 3, seq: 'ATGGCC')
+          seg = build(:segment, seq: seq)
+          snp1 = build(:snp, position: 4, alls: ['T','C'] )
+          snp2 = build(:snp, position: 7, alls: ['G','C'] )
+          snps = [snp1, snp2]
+          count = SynCount.new(n: 2.0)
+          seg.stub(:snps).and_return(snps)
 
           MutationCount::Routine
             .new(segment: seg)
             .pn_ps
-            .should == {syn: 0.0, nonsyn: 1.0}
-        end
-      end
-      context 'for segment with sequence GCC and mutation at third base' do
-        it 'returns {syn: 1.0, nonsyn: 0.0}' do
-          seg = Fabricate(:segment) do
-            _ref_seq Sequence.new([[1,'G'], [2,'C'], [3,'C']])
-          end
-
-          snp = Fabricate(:snp) do
-            position 3
-          end
-
-          seg.stub(:snps).and_return([snp])
-
-          MutationCount::Routine
-            .new(segment: seg)
-            .pn_ps
-            .should == {syn: 1.0, nonsyn: 0.0}
+            .should == count
         end
       end
     end
+
+  end
+end
+describe '.dn_ds'
+
+  context 'with Ermakova method' do
+
+    context 'for segment with sequence ATGCGTCCG starting at 3' do
+      context 'with divs AT at 3, GA at 5, CA at 6, TC at 8' do
+        it 'returns syn: 0.5, nonsyn: 1.5' do
+          seq  = build(:sequence, start: 3, seq: 'ATGCGTCCG')
+          seg  = build(:segment, seq: seq)
+          divs = []
+          divs << build(:div, position: 3, alls: ['A','T'] )
+          divs << build(:div, position: 5, alls: ['G','A'] )
+          count = SynCount.new(s: 0.5, n: 1.5)
+          seg.stub(:divs).and_return(divs)
+
+          MutationCount::Routine
+            .new(segment: seg, method: 'ermakova')
+            .dn_ds
+            .should == count
+        end
+      end
+    end
+
+    context 'for segment with sequence ATGCGTCCG starting at 3' do
+      context 'with divs AT at 3, GA at 5, CA at 6, TC at 8' do
+        it 'returns syn: 1.5, nonsyn: 2.5' do
+          seq  = build(:sequence, start: 3, seq: 'ATGCGTCCG')
+          seg  = build(:segment, seq: seq)
+          divs = []
+          divs << build(:div, position: 3, alls: ['A','T'] )
+          divs << build(:div, position: 5, alls: ['G','A'] )
+          divs << build(:div, position: 6, alls: ['C','A'] )
+          divs << build(:div, position: 8, alls: ['T','C'] )
+          count = SynCount.new(s: 1.5, n: 2.5)
+          seg.stub(:divs).and_return(divs)
+
+          MutationCount::Routine
+            .new(segment: seg, method: 'ermakova')
+            .dn_ds
+            .should == count
+        end
+      end
+    end
+
   end
 
 end

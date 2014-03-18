@@ -30,7 +30,7 @@ group :development, :test do
   gem 'rspec'
   gem 'rspec-rails'
   gem 'guard-rspec', require: false
-  gem 'fabrication'
+  gem 'factory_girl_rails'
   gem 'ruby-prof'
 end
 

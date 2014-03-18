@@ -6,9 +6,9 @@ class CreateDivs < ActiveRecord::Migration
       t.text    :alleles
     end
 
-    add_index :divs,
-              [:chromosome, :position],
-              :name => 'divs__chr_pos'
+    # add_index :divs,
+    #           [:chromosome, :position],
+    #           :name => 'divs__chr_pos'
   end
 
   def down

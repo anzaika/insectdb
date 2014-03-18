@@ -5,7 +5,7 @@ class SeqEnum
 
   def initialize(input, is_path = true)
     @seq = (is_path ? fagz_to_seq(input) : input)
-    sanitize
+    # sanitize
     @length = @seq.length
     @pntr = -1
   end
@@ -18,17 +18,17 @@ class SeqEnum
     @pntr = -1
   end
 
-  def seq
-    @seq.split('')
+  def [](pos, step)
+    SeqEnum.new(@seq[pos,step], false)
   end
 
-  def [](pos, step)
-    if pos+step < @length
-      SeqEnum.new(@seq[pos,step], false)
-    else
-      SeqEnum.new(@seq[pos,step] + ('N'*((pos+step)-@length)), false)
-    end
-  end
+  # def [](pos, step)
+  #   if pos+step < @length
+  #     SeqEnum.new(@seq[pos,step], false)
+  #   else
+  #     SeqEnum.new(@seq[pos,step] + ('N'*((pos+step)-@length)), false)
+  #   end
+  # end
 
   private
 

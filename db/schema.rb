@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140303162714) do
+ActiveRecord::Schema.define(version: 20140315071427) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -84,12 +84,21 @@ ActiveRecord::Schema.define(version: 20140303162714) do
   add_index "segments", ["chromosome", "start", "stop"], name: "segments__chr_start_stop", using: :btree
   add_index "segments", ["type"], name: "segments__type", using: :btree
 
+  create_table "seqs", force: true do |t|
+    t.integer "chromosome"
+    t.integer "position"
+    t.string  "dmel"
+    t.string  "dsim"
+    t.string  "dyak"
+    t.text    "poly"
+  end
+
   create_table "snps", force: true do |t|
     t.integer "chromosome"
     t.integer "position"
     t.integer "sig_count"
-    t.integer "aaf"
     t.text    "alleles"
+    t.float   "aaf"
   end
 
   add_index "snps", ["chromosome", "position", "sig_count"], name: "snps__chr_sigcount_pos", using: :btree

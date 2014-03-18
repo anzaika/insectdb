@@ -79,11 +79,9 @@ class Codon
 
   # Check whether two codons code for the same aa
   #
-  # @param [Array] codon_1 ['A','T','G']
-  # @param [Array] codon_2 ['C','T','A']
   # @return [Boolean]
-  def self.codons_syn?(codon_1, codon_2)
-    codon_1.translate == codon_2.translate
+  def self.codons_syn?(codons)
+    codons.first.translate == codons.last.translate
   end
 
   # Check codon for being a stop codon
@@ -94,8 +92,9 @@ class Codon
     translate(codon) == '*' ? true : false
   end
 
-  def self.simple_create( start: start, seq: seq)
-    self.new( (start..(start+2)).zip(seq.split('')) )
+  def self.simple_create(start: start, seq: seq)
+    codon_arr = (start..(start+2)).zip(seq.split(''))
+    self.new(codon_arr)
   end
 
   # Public
@@ -103,7 +102,7 @@ class Codon
   # codon - The Array of this structure: [[1,'A'],[2,'G'],[3,'C']]
   #
   # Returns The Codon object.
-  def initialize( codon: codon )
+  def initialize(codon)
     if (codon.class != Array) ||
        (codon.size != 3)
       raise ArgumentError,
@@ -117,6 +116,21 @@ class Codon
     self.pos_codon == other_codon.pos_codon
   end
 
+  def glob_to_int(pos)
+    pos - start
+  end
+
+  def syn_map
+    SITE_SYNONYMITY[nuc_codon.join]
+  end
+
+  def seq
+    nuc_codon.join
+  end
+
+  def nuc_at(global_pos)
+    nuc_codon[glob_to_int(global_pos)]
+  end
 
   def nuc_codon
     @nuc_codon ||= @codon.map(&:last)
@@ -127,11 +141,15 @@ class Codon
   end
 
   def start
-    pos_codon.first
+    @codon[0][0]
   end
 
   def stop
-    pos_codon.last
+    @codon[-1][0]
+  end
+
+  def base(n)
+    @codon[n]
   end
 
   def translate
@@ -139,19 +157,9 @@ class Codon
   end
 
   def valid?
-    !nuc_codon.include?('N')
+    translate
   end
 
-  # Public: Does this codon have this position?
-  #
-  # pos - The Integer with position.
-  #
-  # Examples:
-  #
-  #   Codon.new([[1,'A'],[2,'B'],[3,'C']]).has_pos?(2) #=> true
-  #   Codon.new([[1,'A'],[2,'B'],[3,'C']]).has_pos?(7) #=> false
-  #
-  # Returns The Boolean.
   def has_pos?( pos )
     pos_codon.include?(pos)
   end
@@ -174,47 +182,8 @@ class Codon
       .map(&:first)
   end
 
-  def include?( nuc )
-    nuc_codon.include?(nuc)
-  end
-
-  # Public: Apply mutation onto this codon.
-  #
-  # Examples:
-  #
-  #   Codon.new([[1,'A'],[2,'C'],[3,'C']])
-  #                  .mutate([2, ['C','G']])
-  #
-  # mutation -  An Array that is a simplified Snp or Div.
-  #
-  # Returns a Codon.
-  def mutate( mutation )
-
-    ind = @codon.index{ |a| a[0] == mutation.pos }
-    current_nuc = @codon[ind][1]
-    new_nuc = mutate_nucleotide(current_nuc, mutation.alleles)
-
-    # if mutation has no common nucleotides with this codon
-    return nil unless new_nuc
-
-    new_codon = @codon.clone
-    new_codon[ind] = [mutation.pos, new_nuc]
-
-    Codon.new(codon: new_codon)
-
-  end
-
-  # Private: Return a mutated nucleotide value for the
-  # existing nucleotide and mutation pattern passed.
-  def mutate_nucleotide( old_nuc, poly )
-
-    poly.include?(old_nuc) ? poly.find{ |nuc| nuc != old_nuc } : nil
-
-  end
-
   def pos_syn?(position)
     poss('syn').include?(position)
   end
-
 
 end

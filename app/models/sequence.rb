@@ -2,6 +2,12 @@ class Sequence
   include Constants
   attr_reader :seq, :strand
 
+  def self.simple_create(start: start, seq: seq)
+    len = seq.length
+    array = (start...(start+len)).zip(seq.split(''))
+    self.new(array)
+  end
+
   # Public
   #
   # seq_with_coords - The Array with positions and nucleotides, i.e. [[1,'A'],[2,'G']]
@@ -78,7 +84,7 @@ class Sequence
     return [] if length < 3
 
     @seq.each_slice(3)
-        .map { |c| c.size == 3 ? Codon.new(codon: c) : nil }
+        .map { |c| c.size == 3 ? Codon.new(c) : nil }
         .compact
 
   end

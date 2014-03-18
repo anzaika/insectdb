@@ -1,43 +1,41 @@
 require 'spec_helper'
 
 describe MutationCount::Leushkin do
-  describe '#mut_position' do
-    it 'returns mutation position in inner codon coordinates, i.e. 0,1,2' do
-      # MutationCount::Leushkin.mut_position
-      codon = Codon.new( codon: [ [4, 'A'], [5, 'C'], [6, 'G'] ] )
-      mutation = double('Snp')
-      mutation.stub(:pos).and_return(5)
+  let(:codon) {build(:codon, start: 4, seq: 'ACG')}
+  describe '#process' do
 
-      MutationCount::Leushkin
-        .mut_position( codon: codon, mutation: mutation)
-        .should == 1
-    end
-  end
+    context 'for codon ACG at positions 4,5,6' do
 
-  describe '#get_result' do
-
-    context 'for codon ACG and mutation at second position ' do
-      it 'returns {syn: 0.0, nonsyn: 1.0}' do
-        codon = Codon.new( codon: [ [4, 'A'], [5, 'C'], [6, 'G'] ] )
-        mutation = double('Snp')
-        mutation.stub(:pos).and_return(5)
-
-        MutationCount::Leushkin
-          .get_result( codon: codon, mutation: mutation)
-          .should == { syn: 0.0, nonsyn: 1.0}
+      context 'and mutation CT at 5' do
+        it 'returns {syn: 0.0, nonsyn: 1.0}' do
+          mutation = build(:mutation, pos: 5, alleles: ['C','T'])
+          count = SynCount.new(n: 1.0)
+          MutationCount::Leushkin
+            .new(codon: codon, mutations: [mutation])
+            .run
+            .should == count
+        end
       end
-    end
 
-    context 'for codon GCC and mutation at third position' do
-      it 'returns {syn: 1.0, nonsyn: 0.0}' do
-        codon = Codon.new( codon: [ [4, 'G'], [5, 'C'], [6, 'C'] ] )
-        mutation = double('Snp')
-        mutation.stub(:pos).and_return(6)
-
-        MutationCount::Leushkin
-          .get_result( codon: codon, mutation: mutation)
-          .should == { syn: 1.0, nonsyn: 0.0}
+      context 'and mutation AG at 6' do
+        it 'returns {syn: 1.0, nonsyn: 0.0}' do
+          mutation = build(:mutation, pos: 6, alleles: ['A','G'])
+          count = SynCount.new(s: 1.0)
+          MutationCount::Leushkin
+            .new(codon: codon, mutations: [mutation])
+            .run
+            .should == count
+        end
       end
+
+      context 'and mutation AT at 18' do
+        it 'returns {syn: 0.0, nonsyn: 0.0}'
+      end
+
+      context 'and mutations AT at 4 and GT at 10' do
+        it 'returns {syn: 0.0, nonsyn: 0.0}'
+      end
+
     end
 
   end

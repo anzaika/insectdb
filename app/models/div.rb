@@ -25,7 +25,7 @@ class Div < ActiveRecord::Base
   #                            765986 )
   #
   # Returns The Insectdb::Div object.
-  def self.from_hash( ref, chr, pos )
+  def self.from_hash( ref: ref, chr: chr, pos: pos)
 
     self.create!(
       :chromosome => CHROMOSOMES[chr],
@@ -98,9 +98,10 @@ class Div < ActiveRecord::Base
   end
 
   def to_mutation
+    alls = [alleles[:dmel], alleles[:dsim]]
     Mutation.new(
-      pos:     self.position,
-      alleles: self.alleles.values.uniq
+      pos:     position,
+      alleles: alls
     )
   end
 end
