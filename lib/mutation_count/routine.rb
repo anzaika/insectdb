@@ -59,7 +59,5 @@ class Routine
     @divs ||= @segment.divs.map(&:to_mutation)
   end
 
-
-
 end
 end

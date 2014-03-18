@@ -29,16 +29,6 @@ describe ".mutate_with" do
       end
     end
 
-    context "with mutation TA at position 3" do
-      it "returns nil" do
-        mutation = build(:mutation, pos: 3, alleles: ['T','A'])
-        MutatingCodon
-          .new(codon)
-          .mutate_with(mutation)
-          .should be_nil
-      end
-    end
-
     context "with mutation TA at position 5" do
       it "returns nil" do
         mutation = build(:mutation, pos: 5, alleles: ['T','A'])

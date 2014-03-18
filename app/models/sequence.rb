@@ -28,9 +28,6 @@ class Sequence
     @seq.map(&:last)
   end
 
-  # Public: Return NA sequence as the String.
-  #
-  # Returns The String.
   def sseq
       @seq.map(&:last).join
   end

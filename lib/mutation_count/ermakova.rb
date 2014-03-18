@@ -3,7 +3,7 @@ class Ermakova
 
   def initialize(codon: codon, mutations: mutations)
     @cod = codon
-    @muts = mutations
+    @muts = filter(mutations)
     @count = SynCount.new
   end
 
@@ -13,6 +13,12 @@ class Ermakova
   end
 
   private
+
+  def filter(mutations)
+    mutations.select do |m|
+      MutatingCodon.mut_cod_match?(codon: @cod, mutation: m)
+    end
+  end
 
   def passes_check?
     got_muts?

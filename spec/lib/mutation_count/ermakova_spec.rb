@@ -34,7 +34,17 @@ describe '.run' do
     end
 
     context 'and mutation AT at 18' do
-      it 'returns {syn: 0.0, nonsyn: 0.0}'
+      it 'returns {syn: 0.0, nonsyn: 0.0}' do
+        muts = []
+        muts << build(:mutation, pos: 18, alleles: ['A','T'])
+        count = SynCount.new
+
+        MutationCount::Ermakova
+          .new(codon: codon, mutations: muts)
+          .run
+          .should == count
+
+      end
     end
 
     context 'and mutations AT at 4 and GT at 10' do

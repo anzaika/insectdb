@@ -1,5 +1,9 @@
 class MutatingCodon
 
+  def self.mut_cod_match?(codon: codon, mutation: mutation)
+    mutation.alleles.include?(codon.nuc_at(mutation.pos))
+  end
+
   def initialize(codon)
     @cod = codon
   end
@@ -31,7 +35,7 @@ class MutatingCodon
   end
 
   def check_mutation
-    mut_alleles_correct? && mut_pos_correct?
+    mut_pos_correct?
   end
 
   # Private: One of mutation alleles should be present in codon at
@@ -45,32 +49,5 @@ class MutatingCodon
     @cod.pos_codon.include?(@mut.pos)
   end
 
-  # Public: Apply mutation onto this codon.
-  #
-  # Examples:
-  #
-  #   Codon.new([[1,'A'],[2,'C'],[3,'C']])
-  #                  .mutate(mutation)
-  #
-  # mutation -  The Mutation object
-  #
-  # Returns a Codon.
-  # def mutate
-  #   base_ind = @codon.index{ |a| a[0] == mutation.pos }
-  #   new_nuc = mutate_nucleotide(current_nuc, mutation.alleles)
-
-  #   # if mutation has no common nucleotides with this codon
-
-  #   new_codon = @codon.clone
-  #   new_codon[ind] = [mutation.pos, new_nuc]
-
-  #   Codon.new(codon: new_codon)
-  # end
-
-  # # Private: Return a mutated nucleotide value for the
-  # # existing nucleotide and mutation pattern passed.
-  # def mutate_nucleotide(nuc, nuc_arr)
-  #   nuc_arr.find{|n| n != nuc}
-  # end
 
 end
