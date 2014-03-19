@@ -83,27 +83,6 @@ class Snp < ActiveRecord::Base
     col.select{ |n| %W[A C G T].include?(n) }.uniq.size > 1
   end
 
-  # Public: Analyses the synonimity of the mutation.
-  #
-  # Returns two values:
-  # * synonimity of mutation - The Boolean or nil.
-  # * synonimity coefficient - The Float or nil.
-  def syn?
-
-    unless (codon = Segment.codon_at(chromosome, position)) && codon.valid?
-      return [nil, nil]
-    end
-
-    other_snps =
-      Snp.where("chromosome = ? and position in (?)",
-                 chromosome,
-                 codon.pos_codon.select{ |p| p != position })
-    return [nil, nil] unless other_snps.empty?
-
-    [codon.pos_syn?(position), nil]
-
-  end
-
   def to_mutation
     Mutation.new(
       pos:     self.position,

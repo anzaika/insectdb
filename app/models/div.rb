@@ -73,30 +73,6 @@ class Div < ActiveRecord::Base
 
   end
 
-  # Public: Analyses the synonimity of the mutation.
-  #
-  # Returns two values:
-  # * synonimity of mutation - The Boolean or nil.
-  # * synonimity coefficient - The Float or nil.
-  def syn?
-
-    return [nil, nil] unless codon = Segment.codon_at(chromosome, position)
-    return [nil, nil] unless codon.valid?
-
-    other_divs =
-      Div.where("chromosome = ? and position in (?)",
-                 chromosome,
-                 codon.pos_codon.select{ |p| p != position })
-    return [nil, nil] unless other_divs.empty?
-
-    [codon.pos_syn?(position), nil]
-
-  end
-
-  def codon
-    Segment.codon_at(chromosome, position).codon
-  end
-
   def to_mutation
     alls = [alleles[:dmel], alleles[:dsim]]
     Mutation.new(
