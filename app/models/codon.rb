@@ -77,6 +77,75 @@ class Codon
     'CCT' => 'nns'
   }
 
+  R = 2.87230166688849
+
+  FRACTIONED_SITE_SYNONIMITY = {
+      'GCC' => 1,
+      'AGT' => R/(1+R),
+      'TGA' => nil,
+      'TGT' => R/(0.5+R),
+      'CGA' => 1.5,
+      'ATC' => (0.5+R)/(1+R),
+      'AAC' => R/(1+R),
+      'AGC' => R/(1+R),
+      'TAC' => 1,
+      'ACA' => 1,
+      'TCG' => 1,
+      'CCG' => 1,
+      'CTG' => (1+2*R)/(1+R),
+      'GCA' => 1,
+      'GTG' => 1,
+      'AAG' => R/(1+R),
+      'GTT' => 1,
+      'CAC' => R/(1+R),
+      'AGA' => 1/(1+2*R)+R/(1+R),
+      'ACC' => 1,
+      'CCA' => 1,
+      'TGG' => 0,
+      'CGC' => 1,
+      'CTC' => 1,
+      'TTG' => 2*R/(1+R),
+      'TAA' => nil,
+      'CAG' => R/(1+R),
+      'ACG' => 1,
+      'ATG' => 0,
+      'AAA' => R/(1+R),
+      'GTA' => 1,
+      'CTT' => 1,
+      'TAG' => nil,
+      'GGA' => 1,
+      'GTC' => 1,
+      'TGC' => R/(0.5+R),
+      'TCA' => 1,
+      'ATT' => (0.5+R)/(1+R),
+      'TAT' => 1,
+      'AAT' => R/(1+R),
+      'ACT' => 1,
+      'CAA' => R/(1+R),
+      'GAC' => R/(1+R),
+      'GGT' => 1,
+      'TCC' => 1,
+      'TTT' => R/(1+R),
+      'AGG' => (0.5+R)/(1+R),
+      'CGT' => 1,
+      'ATA' => 1/(1+R),
+      'CAT' => R/(1+R),
+      'CGG' => (1.5+R)/(1+R),
+      'GGG' => 1,
+      'CCC' => 1,
+      'GAG' => R/(1+R),
+      'TTA' => 2*R/(1+R),
+      'CTA' => (1+2*R)/(1+R),
+      'GAT' => R/(1+R),
+      'TCT' => 1,
+      'TTC' => R/(1+R),
+      'GCG' => 1,
+      'GGC' => 1,
+      'GAA' => R/(1+R),
+      'GCT' => 1,
+      'CCT' => 1
+    }
+
   # Check whether two codons code for the same aa
   #
   # @return [Boolean]
@@ -122,6 +191,11 @@ class Codon
 
   def syn_map
     SITE_SYNONYMITY[nuc_codon.join]
+  end
+
+  def fractioned_syn_pos_count
+    syn = FRACTIONED_SITE_SYNONIMITY[nuc_codon.join]
+    syn ? SynCount.new(s: syn, n: 3-syn) : SynCount.new
   end
 
   def seq
