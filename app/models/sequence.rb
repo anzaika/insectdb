@@ -17,6 +17,16 @@ class Sequence
     @seq = seq_with_coords
   end
 
+  def complement
+    comp_nuc_seq =
+      Bio::Sequence::NA
+        .new(sseq)
+        .complement
+        .upcase
+        .split('')
+    Sequence.new(pos_seq.reverse.zip(comp_nuc_seq))
+  end
+
   # Public: Return the array with nucleotides of this sequence.
   #
   # Examples:
@@ -28,8 +38,12 @@ class Sequence
     @seq.map(&:last)
   end
 
+  def pos_seq
+    @seq.map(&:first)
+  end
+
   def sseq
-      @seq.map(&:last).join
+    @seq.map(&:last).join
   end
 
   # Public: Return nucleotide at position.

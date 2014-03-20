@@ -27,10 +27,29 @@ class Mrna < ActiveRecord::Base
     _ref_seq || set_ref_seq
   end
 
-  def set_ref_seq
-    segments.map(&:ref_seq)
-            .reduce(:+)
-            .tap{|seq| update_attribute('_ref_seq', seq)}
+  def codons_for_segment(start: start, stop: stop)
+    if positive?
+      ref_seq.codons
+             .select{|c| c.start >= start && c.stop <= stop}
+    else
+      ref_seq.codons
+             .select{|c| c.start <= stop && c.stop >= start}
+    end
   end
+
+  private
+
+  def set_ref_seq
+    segments
+      .coding
+      .map(&:ref_seq)
+      .reduce(:+)
+      .tap{|seq| update_attribute('_ref_seq', positive? ? seq : seq.complement)}
+  end
+
+  def positive?
+    strand == '+'
+  end
+
 
 end

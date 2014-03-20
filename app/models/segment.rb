@@ -9,7 +9,7 @@ class Segment < ActiveRecord::Base
   scope :alt,    -> { where( :type => 'coding(alt)'   )}
   scope :const,  -> { where( :type => 'coding(const)' )}
   scope :int,    -> { where( :type => 'intron'        )}
-  scope :coding, -> { where( "type != 'intron'"       )}
+  scope :coding, -> { where( "type in ('coding(alt)', 'coding(const)')")}
 
   validates :chromosome,
             :presence => true,
@@ -49,11 +49,7 @@ class Segment < ActiveRecord::Base
 
   def codons
     if mrnas.count > 0
-      mrnas
-        .first
-        .ref_seq
-        .codons
-        .select{ |c| c.start >= self.start && c.stop <= self.stop }
+      mrnas.first.codons_for_segment(start: start, stop: stop)
     else
       nil
     end
