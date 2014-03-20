@@ -16,8 +16,8 @@ class SynCount
   end
 
   def +(other)
-    s_sum = self.s + other.s
-    n_sum = self.n + other.n
+    s_sum = (self.s + other.s).round(3)
+    n_sum = (self.n + other.n).round(3)
     SynCount.new(s: s_sum, n: n_sum)
   end
 

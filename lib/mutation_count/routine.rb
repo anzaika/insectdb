@@ -19,8 +19,15 @@ class Routine
 
   private
 
+  def norm
+    @segment.codons.map(&:fractioned_syn_pos_count).reduce(:+)
+  end
+
   def build_result(all_muts)
-    count_for_all_codons(all_muts).reduce(:+)
+    counts = count_for_all_codons(all_muts).reduce(:+)
+    counts.s = (counts.s/norm.s).round(3)
+    counts.n = (counts.n/norm.n).round(3)
+    counts
   end
 
   def count_for_all_codons(all_muts)

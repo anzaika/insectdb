@@ -14,6 +14,12 @@ class Ermakova
 
   private
 
+  # def normalize
+  #   norm     = @cod.fractioned_syn_pos_count
+  #   @count.s = @count.s/norm.s
+  #   @count.n = @count.n/norm.n
+  # end
+
   def filter(mutations)
     mutations.select do |m|
       MutatingCodon.mut_cod_match?(codon: @cod, mutation: m)
