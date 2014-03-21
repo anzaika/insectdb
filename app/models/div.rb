@@ -1,5 +1,6 @@
 class Div < ActiveRecord::Base
   include Constants
+  include ToMutation
 
   serialize :alleles
 
@@ -66,18 +67,9 @@ class Div < ActiveRecord::Base
   #
   # Returns The Boolean.
   def self.position_is_divergent?( hash )
-
     (hash[:dsim] == hash[:dyak]) &&
     (hash[:dmel] != hash[:dsim]) &&
     !hash.values.include?('N')
-
   end
 
-  def to_mutation
-    alls = [alleles[:dmel], alleles[:dsim]]
-    Mutation.new(
-      pos:     position,
-      alleles: alls
-    )
-  end
 end

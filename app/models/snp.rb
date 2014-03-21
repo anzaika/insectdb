@@ -1,5 +1,6 @@
 class Snp < ActiveRecord::Base
   include Constants
+  include ToMutation
   serialize :alleles
 
   validates :chromosome,
@@ -81,13 +82,6 @@ class Snp < ActiveRecord::Base
   # Returns The Boolean.
   def self.column_is_polymorphic?( col )
     col.select{ |n| %W[A C G T].include?(n) }.uniq.size > 1
-  end
-
-  def to_mutation
-    Mutation.new(
-      pos:     self.position,
-      alleles: self.alleles.keys
-    )
   end
 
 end

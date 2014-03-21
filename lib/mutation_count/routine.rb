@@ -9,25 +9,22 @@ class Routine
 
   def pn_ps
     return SynCount.new if @codons.empty? || snps.empty?
-    build_result(snps)
+    build_mutcount(snps)
   end
 
   def dn_ds
     return SynCount.new if @codons.empty? || divs.empty?
-    build_result(divs)
+    build_mutcount(divs)
   end
-
-  private
 
   def norm
     @segment.codons.map(&:fractioned_syn_pos_count).reduce(:+)
   end
 
-  def build_result(all_muts)
-    counts = count_for_all_codons(all_muts).reduce(:+)
-    counts.s = (counts.s/norm.s).round(3)
-    counts.n = (counts.n/norm.n).round(3)
-    counts
+  private
+
+  def build_mutcount(all_muts)
+    count_for_all_codons(all_muts).reduce(:+)
   end
 
   def count_for_all_codons(all_muts)
@@ -59,11 +56,15 @@ class Routine
   end
 
   def snps
-    @snps ||= @segment.snps.map(&:to_mutation)
+    @snps ||= @segment.snps.map{|m| m.to_mutation(negative_strand?)}
   end
 
   def divs
-    @divs ||= @segment.divs.map(&:to_mutation)
+    @divs ||= @segment.divs.map{|m| m.to_mutation(negative_strand?)}
+  end
+
+  def negative_strand?
+    !@segment.mrnas.first.positive?
   end
 
 end

@@ -10,11 +10,16 @@ describe '.pn_ps' do
         it 'returns {syn: 0.0, nonsyn: 2.0}' do
           seq = build(:sequence, start: 3, seq: 'ATGGCC')
           seg = build(:segment, seq: seq)
+
           snp1 = build(:snp, position: 4, alls: ['T','C'] )
           snp2 = build(:snp, position: 7, alls: ['G','C'] )
           snps = [snp1, snp2]
-          count = SynCount.new(n: 2.0)
           seg.stub(:snps).and_return(snps)
+
+          mrna = build(:mrna, seq: seq)
+          seg.stub(:mrnas).and_return([mrna])
+
+          count = SynCount.new(n: 2.0)
 
           MutationCount::Routine
             .new(segment: seg)
@@ -41,6 +46,9 @@ describe '.dn_ds'
           count = SynCount.new(s: 0.5, n: 1.5)
           seg.stub(:divs).and_return(divs)
 
+          mrna = build(:mrna, seq: seq)
+          seg.stub(:mrnas).and_return([mrna])
+
           MutationCount::Routine
             .new(segment: seg, method: 'ermakova')
             .dn_ds
@@ -61,6 +69,9 @@ describe '.dn_ds'
           divs << build(:div, position: 8, alls: ['T','C'] )
           count = SynCount.new(s: 1.5, n: 2.5)
           seg.stub(:divs).and_return(divs)
+
+          mrna = build(:mrna, seq: seq)
+          seg.stub(:mrnas).and_return([mrna])
 
           MutationCount::Routine
             .new(segment: seg, method: 'ermakova')

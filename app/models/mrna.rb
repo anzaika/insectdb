@@ -37,6 +37,10 @@ class Mrna < ActiveRecord::Base
     end
   end
 
+  def positive?
+    strand == '+'
+  end
+
   private
 
   def set_ref_seq
@@ -46,10 +50,5 @@ class Mrna < ActiveRecord::Base
       .reduce(:+)
       .tap{|seq| update_attribute('_ref_seq', positive? ? seq : seq.complement)}
   end
-
-  def positive?
-    strand == '+'
-  end
-
 
 end
