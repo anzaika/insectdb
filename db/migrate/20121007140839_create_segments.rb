@@ -1,23 +1,24 @@
 class CreateSegments < ActiveRecord::Migration
   def up
-    create_table :segments, :id => false do |t|
-      t.integer :id
+    create_table :segments do |t|
       t.integer :chromosome
       t.integer :start
       t.integer :stop
       t.integer :length
       t.string  :type
       t.text    :_ref_seq
+
+      t.string :inclusion_pattern
+      t.string :segment_gain
     end
-    execute("ALTER TABLE segments ADD PRIMARY KEY (id)")
 
     add_index :segments,
-              [:chromosome, :start, :stop],
-              :name => 'segments__chr_start_stop'
+              [:id],
+              :name => 'segment__id'
 
     add_index :segments,
-              [:type],
-              :name => 'segments__type'
+              [:type, :chromosome],
+              :name => 'segments__type_chromosome'
   end
 
   def down
