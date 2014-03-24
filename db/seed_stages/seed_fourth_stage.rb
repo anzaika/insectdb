@@ -1,3 +1,10 @@
+#############################################################################
+#
+# Upload all data from db/seed_data/annotation into their tables
+#
+#############################################################################
+
+require_relative 'paths'
 module SeedFourthStage
   class Seeder
     include Constants
@@ -87,7 +94,7 @@ module SeedFourthStage
       printf "Seeding #{sym.to_s.capitalize}... "
 
       start = Time.now
-      errors = _exec_and_catch_errors(SEEDS[sym], &block)
+      errors = _exec_and_catch_errors(Insectdb::SEEDS[sym], &block)
       time = (Time.now - start).round
 
       puts "took #{time} sec"

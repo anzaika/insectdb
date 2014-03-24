@@ -1,3 +1,9 @@
+########################################################
+#
+# Populate Div and Snp tables with data from Seq table
+#
+########################################################
+
 module SeedThirdStage
 
   def self.for_all
@@ -6,11 +12,11 @@ module SeedThirdStage
   class Seeder
     include Constants
     def initialize(
-      chromosome: chromosome,
+      chr: chr,
       processes: 30,
       step: 10000)
 
-      @chr = chromosome
+      @chr = chr
       @step = step
       @processes = processes
       @pll_index = (0...(block_count(step))).to_a
@@ -42,8 +48,6 @@ module SeedThirdStage
       when [true, false] then Snp.from_col(ref: ref, poly: poly, chr: @chr, pos: pos)
       when [false, true] then Div.from_hash(ref: ref, chr: @chr, pos: pos)
       end
-
-      Reference.from_hash(ref, @chr, pos)
     end
 
     def check(ref, poly)

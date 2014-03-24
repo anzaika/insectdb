@@ -1,3 +1,10 @@
+########################################################
+#
+# Add index to Seq table
+#
+########################################################
+
+
 module SeedSecondStage
   def self.run
     ActiveRecord::Base

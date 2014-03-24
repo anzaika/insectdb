@@ -1,9 +1,17 @@
+########################################################
+#
+# Load data from db/seed_data/sequences into Seq table
+#
+########################################################
+
+require_relative 'paths'
+
 module SeedFirstStage
   class Seeder
     include Constants
 
     def initialize(chr: chr,
-                   step: step,
+                   step: 10000,
                    processes: 30)
       @chr = chr
       @step = step
@@ -58,12 +66,12 @@ module SeedFirstStage
         "drosophila_melanogaster/dm3_#{@chr}.fa.gz",
         "drosophila_simulans/droSim1_#{@chr}.fa.gz",
         "drosophila_yakuba/droYak2_#{@chr}.fa.gz"
-      ].map{ |f| File.join(SEEDS[:seqs], f) }
+      ].map{ |f| File.join(Insectdb::SEEDS[:seqs], f) }
     end
 
     def dmel_files
       Dir[
-        File.join(SEEDS[:seqs], "drosophila_melanogaster/*_#{@chr}.fa.gz")
+        File.join(Insectdb::SEEDS[:seqs], "drosophila_melanogaster/*_#{@chr}.fa.gz")
       ]
     end
 
