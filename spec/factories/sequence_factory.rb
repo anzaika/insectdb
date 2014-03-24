@@ -4,7 +4,7 @@ FactoryGirl.define do
 
     ignore do
       start 1
-      seq 'ATGCCT'
+      seq 'ATGCCCTAA'
     end
 
     initialize_with do

@@ -27,6 +27,18 @@ class Sequence
     Sequence.new(pos_seq.reverse.zip(comp_nuc_seq))
   end
 
+  def shift
+    @seq.shift
+  end
+
+  def pop
+    @seq.pop
+  end
+
+  def empty?
+    @seq.empty?
+  end
+
   # Public: Return the array with nucleotides of this sequence.
   #
   # Examples:

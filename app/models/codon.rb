@@ -155,10 +155,10 @@ class Codon
 
   # Check codon for being a stop codon
   #
-  # @param [Array] codon ['T','A','G']
+  # @param [String] codon 'TAA'
   # @return [Boolean]
   def self.stop_codon?(codon)
-    translate(codon) == '*' ? true : false
+    Bio::Sequence::NA.new(codon).translate == '*' ? true : false
   end
 
   def self.simple_create(start: start, seq: seq)

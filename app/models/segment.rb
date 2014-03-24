@@ -27,15 +27,15 @@ class Segment < ActiveRecord::Base
   validates :type,
             :presence => true
 
-  before_save :set_length
+  before_create :set_length
 
   # Public: Return all SNPs for this segment.
   #
   # Returns ActiveRecord::Relation.
-  def snps(sig_count=150)
+  def snps(sig_count: 150, aaf: 0.5)
     Snp.where("chromosome = ? and sig_count >= ? and position between ? and ?",
                chromosome, sig_count, start, stop)
-       .order("position ASC")
+       .select{|s| !s.alleles.values.include?(1) }
   end
 
   # Public: Return all divs for this segment.
@@ -48,10 +48,11 @@ class Segment < ActiveRecord::Base
   end
 
   def codons
-    if mrnas.count > 0
-      mrnas.first.codons_for_segment(start: start, stop: stop)
+    ms = mrnas.select(&:good_quality)
+    unless ms.empty?
+      ms.first.codons_for_segment(start: start, stop: stop)
     else
-      nil
+      []
     end
   end
 
@@ -83,7 +84,7 @@ class Segment < ActiveRecord::Base
   private
 
   def set_length
-    self.length = stop - start
+    self.length = stop - start + 1
   end
 
 end

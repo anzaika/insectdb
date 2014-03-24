@@ -1,7 +1,7 @@
 module MutCountable
   extend ActiveSupport::Concern
 
-  def pn_ps(method: 'ermakova')
+  def pn_ps(method: 'ermakova', aaf: 0.8, sig_count: 150)
     MutationCount::Routine
       .new(segment: self, method: 'ermakova')
       .pn_ps
