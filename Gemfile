@@ -32,6 +32,7 @@ group :development, :test do
   gem 'guard-rspec', require: false
   gem 'factory_girl_rails'
   gem 'ruby-prof'
+  gem 'database_cleaner'
 end
 
 

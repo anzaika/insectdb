@@ -65,6 +65,7 @@ GEM
       execjs
     coffee-script-source (1.7.0)
     connection_pool (2.0.0)
+    database_cleaner (1.2.0)
     debugging (1.0.1)
       binding.repl (~> 1)
       paint (~> 0, >= 0.8.7)
@@ -285,6 +286,7 @@ DEPENDENCIES
   capistrano-rails (~> 1.1.0)
   capistrano-rbenv (~> 2.0)
   coffee-rails (~> 4.0.0)
+  database_cleaner
   factory_girl_rails
   guard-rspec
   haml
