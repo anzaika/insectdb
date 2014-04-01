@@ -17,3 +17,4 @@
 /config/database.yml
 profiling/**
 db/seed_data
+results

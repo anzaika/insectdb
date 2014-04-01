@@ -2,6 +2,10 @@ class SynCount
 
   attr_reader :s, :n
 
+  def self.from_h(hash)
+    self.new(s: hash['s'], n: hash['n'])
+  end
+
   def initialize(s: 0.0, n: 0.0)
     @s = s
     @n = n

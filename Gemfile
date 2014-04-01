@@ -39,3 +39,4 @@ end
 gem 'bio'
 gem 'parallel'
 gem 'sidekiq'
+gem 'redis'

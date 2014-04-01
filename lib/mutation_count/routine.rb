@@ -7,8 +7,8 @@ class Routine
     @method  = method
   end
 
-  def pn_ps
-    return SynCount.new if @codons.empty? || snps.empty?
+  def pn_ps(params)
+    return SynCount.new if @codons.empty? || snps(params).empty?
     build_mutcount(snps)
   end
 
@@ -18,6 +18,7 @@ class Routine
   end
 
   def norm
+    return SynCount.new if @codons.empty?
     @segment.codons.map(&:fractioned_syn_pos_count).reduce(:+)
   end
 
@@ -55,8 +56,8 @@ class Routine
     .run
   end
 
-  def snps
-    @snps ||= @segment.snps.map{|m| m.to_mutation(negative_strand?)}
+  def snps(params={})
+    @snps ||= @segment.snps(params).map{|m| m.to_mutation(negative_strand?)}
   end
 
   def divs

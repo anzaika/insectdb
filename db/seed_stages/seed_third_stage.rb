@@ -11,11 +11,7 @@ module SeedThirdStage
 
   class Seeder
     include Constants
-    def initialize(
-      chr: chr,
-      processes: 30,
-      step: 10000)
-
+    def initialize(chr: chr, processes: 30, step: 10000)
       @chr = chr
       @step = step
       @processes = processes
@@ -23,7 +19,9 @@ module SeedThirdStage
     end
 
     def run
+      ActiveRecord::Base.connection.reconnect!
       Parallel.each(@pll_index, :in_processes => @processes) do |i|
+        ActiveRecord::Base.connection.reconnect!
         batch_processor(positions_at(i))
       end
     end

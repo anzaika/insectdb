@@ -10,6 +10,7 @@ class Segment < ActiveRecord::Base
   scope :const,  -> { where( :type => 'coding(const)' )}
   scope :int,    -> { where( :type => 'intron'        )}
   scope :coding, -> { where( "type in ('coding(alt)', 'coding(const)')")}
+  scope :noncoding, -> { where( "type not in ('coding(alt)', 'coding(const)')")}
 
   validates :chromosome,
             :presence => true,
@@ -29,13 +30,39 @@ class Segment < ActiveRecord::Base
 
   before_create :set_length
 
+  # Public: Set ref_seq for every segment in the database
+  def self.set_ref_seq
+    Parallel.each(Segment.all, :in_processes => 8) do |m|
+      m.ref_seq
+    end
+    true
+  end
+
   # Public: Return all SNPs for this segment.
   #
   # Returns ActiveRecord::Relation.
-  def snps(sig_count: 150, aaf: 0.5)
-    Snp.where("chromosome = ? and sig_count >= ? and position between ? and ?",
-               chromosome, sig_count, start, stop)
-       .select{|s| !s.alleles.values.include?(1) }
+  def snps(sig_count: 150, aaf: 0.5, age: :all, singletons: :exclude)
+    if age == :all
+      result =
+        Snp.where("chromosome = ? and sig_count >= ? and position between ? and ?",
+                  chromosome, sig_count, start, stop)
+    elsif age == :old
+      result =
+        Snp.where("chromosome = ? and sig_count >= ? and aaf < ? and position between ? and ?",
+                  chromosome, sig_count, aaf, start, stop)
+    elsif age == :new
+      result =
+        Snp.where("chromosome = ? and sig_count >= ? and aaf >= ? and position between ? and ?",
+                  chromosome, sig_count, aaf, start, stop)
+    else
+      raise 'Unknown age passed: ' + age.to_s
+    end
+
+    if singletons == :exclude
+       result = result.select{|s| !s.alleles.values.include?(1) }
+    end
+
+    result
   end
 
   # Public: Return all divs for this segment.
