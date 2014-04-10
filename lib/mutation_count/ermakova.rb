@@ -71,7 +71,5 @@ class Ermakova
     result
   end
 
-
-
 end
 end

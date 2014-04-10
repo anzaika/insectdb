@@ -1,4 +1,4 @@
-require 'sidekiq/api'
+# require 'sidekiq/api'
 
 module MutCountable
   extend ActiveSupport::Concern
@@ -21,27 +21,22 @@ module MutCountable
       .norm
   end
 
-  def alpha
-    p = pn_ps
-    d = dn_ds
-    1 - ((d.s*p.n)/(d.n*p.s))
-  end
-
   module ClassMethods
+
+    BATCH = 300
 
     def alpha_for(segments, **snp_params)
       alpha_processor(segments, **snp_params)
     end
 
     def alpha_processor(segments, **snp_params)
-      reconnect
-      p = pll_pn_ps_for(segments, snp_params)
 
-      reconnect
-      d = pll_dn_ds_for(segments)
+      ids = segments.map(&:id)
 
-      reconnect
-      n = pll_norm(segments)
+      p = pll_pn_ps(ids, snp_params)
+      d = pll_dn_ds(ids)
+      n = pll_norm(ids)
+
 
       dnn = d.n/n.n
       dsn = d.s/n.s
@@ -49,7 +44,6 @@ module MutCountable
       pnn = p.n/n.n
       psn = p.s/n.s
 
-      reconnect
       alpha = (1 - ((dsn*pnn)/(dnn*psn))).round(4)
 
       {
@@ -73,74 +67,68 @@ module MutCountable
       ActiveRecord::Base.connection.reconnect!
     end
 
-    def pll_pn_ps_for(segments, snp_params)
+    def pll_pn_ps(ids, snp_params)
+      # t = Time.now
       r = Redis.new
-      puts hash_name = Random.rand(20000000000).to_s
-      segments.each do |s|
-        PnPsWorker.perform_async(s.id, hash_name, snp_params)
+      hash_name = Random.rand(20000000000).to_s
+      ids.each_slice(BATCH) do |slice|
+        Resque.enqueue(PnPsWorker, slice, hash_name, snp_params)
       end
 
-      while Sidekiq::Stats.new.enqueued != 0 do
-        sleep 1
+      while Resque.size(:mut_count)!= 0 do
+        sleep 5
       end
+
+      sleep 18
+
+      # puts 'Done in: ' + (Time.now - t).round(0).to_s + 's'
 
       result = r.hvals(hash_name).map{|v| SynCount.from_h(JSON.parse(v))}.reduce(:+)
-      # r.flushall
+      r.flushall
       result
     end
 
-    # def pll_pn_ps_for(segments, snp_params)
-
-    #   Parallel
-    #     .map(map, :in_processes => 8){|i| reconnect; segments[i].pn_ps(snp_params)}
-    #     .reduce(:+)
-    # end
-
-    def pll_dn_ds_for(segments)
+    def pll_dn_ds(ids)
+      # t = Time.now
       r = Redis.new
-      puts hash_name = Random.rand(20000000000).to_s
-      segments.each do |s|
-        DnDsWorker.perform_async(s.id, hash_name)
+      hash_name = Random.rand(20000000000).to_s
+      ids.each_slice(BATCH) do |slice|
+        Resque.enqueue(DnDsWorker, slice, hash_name)
       end
 
-      while Sidekiq::Stats.new.enqueued != 0 do
-        sleep 1
+      while Resque.size(:mut_count)!= 0 do
+        sleep 5
       end
+
+      sleep 18
+
+      # puts 'Done in: ' + (Time.now - t).round(0).to_s + 's'
 
       result = r.hvals(hash_name).map{|v| SynCount.from_h(JSON.parse(v))}.reduce(:+)
-      # r.flushall
+      r.flushall
       result
     end
 
-    # def pll_dn_ds_for(segments)
-    #   map = (0...(segments.count)).to_a
-    #   Parallel
-    #     .map(map, :in_processes => 8){|i| reconnect; segments[i].dn_ds}
-    #     .reduce(:+)
-    # end
-
-    def pll_norm(segments)
+    def pll_norm(ids)
+      # t = Time.now
       r = Redis.new
-      puts hash_name = Random.rand(20000000000).to_s
-      segments.each do |s|
-        NormWorker.perform_async(s.id, hash_name)
+      hash_name = Random.rand(20000000000).to_s
+      ids.each_slice(BATCH) do |slice|
+        Resque.enqueue(NormWorker, slice, hash_name)
       end
 
-      while Sidekiq::Stats.new.enqueued != 0 do
-        sleep 1
+      while Resque.size(:mut_count)!= 0 do
+        sleep 5
       end
+
+      sleep 18
+
+      # puts 'Done in: ' + (Time.now - t).round(0).to_s + 's'
 
       result = r.hvals(hash_name).map{|v| SynCount.from_h(JSON.parse(v))}.reduce(:+)
-      # r.flushall
+      r.flushall
       result
     end
-
-    # def pll_norm(segments)
-    #   map = (0...(segments.count)).to_a
-    #   pre =
-    #     Parallel
-    #       .map(map, :in_processes => 8){|i| reconnect; segments[i].norm}
-    # end
 
   end
 

@@ -1,12 +1,18 @@
 require 'json'
 
 class DnDsWorker
-  include Sidekiq::Worker
+  # include Sidekiq::Worker
+  @queue = :mut_count
 
-  def perform(id, hash_name)
+  def self.perform(ids, hash_name)
+    t = Time.now
     r = Redis.new
-    result = Segment.find(id)
-                    .dn_ds(method: 'ermakova')
-    r.hset(hash_name, id.to_s, result.to_json)
+
+    result =
+      ids.map{|id| Segment.find(id).dn_ds(method: 'ermakova')}
+         .reduce(:+)
+
+    r.hset(hash_name, ids.first, result.to_json)
+    puts 'dndsworker out //' + (Time.now-t).round(0).to_s + 's'
   end
 end

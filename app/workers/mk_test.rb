@@ -4,7 +4,7 @@ class MkTest
     for_all_chr_different_ages
     for_all_chr_different_ages_without_singletons
     for_each_chr_different_ages
-    for_each_chr_different_ages_without_singletons:w
+    for_each_chr_different_ages_without_singletons
   end
 
   def for_all_chr_different_ages
@@ -43,8 +43,8 @@ class MkTest
 
   def execute_results_for_chr(snp_params, chr)
     render_head(snp_params, chr)
-    alt   = Segment.alpha_for(Segment.alt.where(chromosome: chr), **snp_params)
-    const = Segment.alpha_for(Segment.const.where(chromosome: chr))
+    alt   = Segment.alpha_for(Segment.alt.where(chromosome: chr).last(100), **snp_params)
+    const = Segment.alpha_for(Segment.const.where(chromosome: chr).last(100))
     render_table(alt, const)
   end
 

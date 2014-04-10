@@ -1,9 +1,10 @@
 require 'json'
 
 class PnPsWorker
-  include Sidekiq::Worker
+  @queue = :mut_count
 
-  def perform(id, hash_name, snp_params)
+  def self.perform(ids, hash_name, snp_params)
+    t = Time.now
     r = Redis.new
 
     snp_params = snp_params.to_a.map do |a|
@@ -13,12 +14,11 @@ class PnPsWorker
       ]
     end.to_h
 
-    puts '*'*20
-    puts snp_params.inspect
-    puts '*'*20
+    result =
+      ids.map{|id| Segment.find(id).pn_ps(method: 'ermakova', **snp_params)}
+        .reduce(:+)
 
-    result = Segment.find(id)
-                    .pn_ps(method: 'ermakova', **snp_params)
-    r.hset(hash_name, id.to_s, result.to_json)
+    r.hset(hash_name, ids.first, result.to_json)
+    puts 'pnpsworker out //' + (Time.now-t).round(0).to_s + 's'
   end
 end
