@@ -5,29 +5,60 @@
 ########################################################
 
 module SeedThirdStage
+  include Constants
 
-  def self.for_all
+  # Production
+  STEP_DEFAULT = 500000
+
+  # Test
+  # STEP_DEFAULT = 20
+
+  def self.run(step: STEP_DEFAULT)
+    CHROMOSOMES.keys.each do |chr|
+      self.submit_jobs(chr, step)
+    end
+
+    while Resque.size(:seed) != 0 || Resque.info[:working] != 0 do
+      sleep 10
+    end
+
+    puts '### Seed stage 3 complete'
+  end
+
+  def self.submit_jobs(chr, step)
+    self.block_count(chr, step).times do |i|
+      Resque.enqueue(SeedThirdStageWorker, chr, i, step)
+    end
+  end
+
+  def self.block_count(chr, step)
+    (self.base_count(chr)/step.to_f).ceil
+  end
+
+  def self.base_count(chr)
+    Seq.where(chromosome: CHROMOSOMES[chr]).count
   end
 
   class Seeder
     include Constants
-    def initialize(chr: chr, processes: 30, step: 10000)
+
+    def initialize(chr, index, step)
       @chr = chr
-      @step = step
-      @processes = processes
-      @pll_index = (0...(block_count(step))).to_a
+      @poss = positions_at(index, step)
+    end
+
+    def positions_at(index, step)
+      start = (index * step + 1)
+      stop  = start + step
+      (start...stop).to_a
     end
 
     def run
-      ActiveRecord::Base.connection.reconnect!
-      Parallel.each(@pll_index, :in_processes => @processes) do |i|
-        ActiveRecord::Base.connection.reconnect!
-        batch_processor(positions_at(i))
-      end
+      batch_processor(@poss)
     end
 
-    def batch_processor(positions)
-      positions.each{|p| position_processor(p)}
+    def batch_processor(poss)
+      poss.each{|p| position_processor(p)}
     end
 
     #############################
@@ -61,20 +92,6 @@ module SeedThirdStage
 
     def seq_at(pos)
       Seq.where(chromosome: CHROMOSOMES[@chr], position: pos).first
-    end
-
-    def block_count(step)
-      (base_count/step.to_f).ceil
-    end
-
-    def base_count
-      Seq.where(chromosome: CHROMOSOMES[@chr]).count
-    end
-
-    def positions_at(index)
-      start = (index * @step + 1)
-      stop  = start + @step
-      (start...stop).to_a
     end
 
   end

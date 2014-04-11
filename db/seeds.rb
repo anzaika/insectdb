@@ -3,17 +3,16 @@ require_relative 'seed_stages/seed_second_stage'
 require_relative 'seed_stages/seed_third_stage'
 require_relative 'seed_stages/seed_fourth_stage'
 
-# SeqSeed.for_each_chromosome_raw
-# AnnotationSeed.new.start
-
-
-# Seed second stage
-# SeedFirstStage::Seeder.new(chr: '3L').run
-# SeedFirstStage::Seeder.new(chr: 'X').run
-# SeedSecondStage.run
-# SeedThirdStage::Seeder.new(chr: '2R').run
-# SeedThirdStage::Seeder.new(chr: '2L').run
-# SeedThirdStage::Seeder.new(chr: '3R').run
-# SeedThirdStage::Seeder.new(chr: '3L').run
-# SeedThirdStage::Seeder.new(chr: 'X').run
+SeedFirstStage.run
+SeedSecondStage.run
+SeedThirdStage.run
 SeedFourthStage::Seeder.new.run
+
+# Set ref_seq's
+
+puts 'Initiate Segment.set_ref_seq'
+Segment.set_ref_seq
+puts '...complete'
+puts 'Initiate Mrna.set_ref_seq'
+Mrna.set_ref_seq
+puts '...complete'

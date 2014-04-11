@@ -37,7 +37,6 @@ end
 
 
 gem 'bio'
-gem 'parallel'
 # gem "resque", "~> 2.0.0.pre.1", github: "resque/resque"
 gem 'resque'
 gem 'redis'

@@ -23,19 +23,11 @@ class Mrna < ActiveRecord::Base
             :presence => true,
             :inclusion => { :in => %W[ + - ] }
 
-  def self.truncate_ref_seq
-    Parallel.each(Mrna.all, :in_processes => 8) do |m|
-      m.update_attributes(_ref_seq: nil, quality_good: nil, quality_reason: nil)
-    end
-    true
-  end
-
   # Public: Set ref_seq for every mRNA in the database
   def self.set_ref_seq
-    Parallel.each(Mrna.all, :in_processes => 8) do |m|
-      m.ref_seq
+    Mrna.all.pluck(:id).each_slice(100) do |slice|
+      Resque.enqueue(MrnaWorker, slice)
     end
-    true
   end
 
   # Public: Return cDNA of this mRNA.

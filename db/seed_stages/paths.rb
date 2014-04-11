@@ -5,8 +5,8 @@ module Insectdb
 
   SEEDS = {
     :seqs             => SEEDS_ROOT + 'sequences',
-    :segmentGain      => ANN_ROOT   + 'segment_gain',
-    :segmentInclusion => ANN_ROOT   + 'incl_changes_for_segments',
+    :gain             => ANN_ROOT   + 'segment_gain',
+    :incl             => ANN_ROOT   + 'incl_changes_for_segments',
     :segments         => ANN_ROOT   + 'segment',
     :mrnas            => ANN_ROOT   + 'mrna',
     :genes            => ANN_ROOT   + 'gene',

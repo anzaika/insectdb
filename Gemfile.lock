@@ -155,7 +155,6 @@ GEM
     ori (0.1.0)
     os (0.9.6)
     paint (0.8.7)
-    parallel (1.0.0)
     pg (0.17.1)
     polyglot (0.3.4)
     pry (0.9.12.6)
@@ -300,7 +299,6 @@ DEPENDENCIES
   jbuilder (~> 2.0)
   jquery-rails
   map_by_method
-  parallel
   pg
   rails (= 4.1.0.rc1)
   redis

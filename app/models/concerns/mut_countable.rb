@@ -33,10 +33,12 @@ module MutCountable
 
       ids = segments.map(&:id)
 
-      p = pll_pn_ps(ids, snp_params)
-      d = pll_dn_ds(ids)
-      n = pll_norm(ids)
+      pll_map(ids, snp_params)
+      result = pll_reduce
 
+      p = result[:p]
+      d = result[:d]
+      n = result[:n]
 
       dnn = d.n/n.n
       dsn = d.s/n.s
@@ -67,67 +69,44 @@ module MutCountable
       ActiveRecord::Base.connection.reconnect!
     end
 
-    def pll_pn_ps(ids, snp_params)
-      # t = Time.now
+    def pll_map(ids, snp_params)
       r = Redis.new
-      hash_name = Random.rand(20000000000).to_s
+      ['p','d','n'].map{|k| r.del(k)}
+      pll_pn_ps(ids, 'p', snp_params)
+      pll_dn_ds(ids, 'd')
+      pll_norm( ids, 'n')
+    end
+
+    def pll_reduce
+      r = Redis.new
+
+      while Resque.size(:mut_count) != 0 || Resque.info[:working] != 0 do
+        sleep 10
+      end
+
+      {
+        :p => r.hvals('p').map{|v| SynCount.from_h(JSON.parse(v))}.reduce(:+),
+        :d => r.hvals('d').map{|v| SynCount.from_h(JSON.parse(v))}.reduce(:+),
+        :n => r.hvals('n').map{|v| SynCount.from_h(JSON.parse(v))}.reduce(:+)
+      }
+    end
+
+    def pll_pn_ps(ids, hash_name, snp_params)
       ids.each_slice(BATCH) do |slice|
         Resque.enqueue(PnPsWorker, slice, hash_name, snp_params)
       end
-
-      while Resque.size(:mut_count)!= 0 do
-        sleep 5
-      end
-
-      sleep 18
-
-      # puts 'Done in: ' + (Time.now - t).round(0).to_s + 's'
-
-      result = r.hvals(hash_name).map{|v| SynCount.from_h(JSON.parse(v))}.reduce(:+)
-      r.flushall
-      result
     end
 
-    def pll_dn_ds(ids)
-      # t = Time.now
-      r = Redis.new
-      hash_name = Random.rand(20000000000).to_s
+    def pll_dn_ds(ids, hash_name)
       ids.each_slice(BATCH) do |slice|
         Resque.enqueue(DnDsWorker, slice, hash_name)
       end
-
-      while Resque.size(:mut_count)!= 0 do
-        sleep 5
-      end
-
-      sleep 18
-
-      # puts 'Done in: ' + (Time.now - t).round(0).to_s + 's'
-
-      result = r.hvals(hash_name).map{|v| SynCount.from_h(JSON.parse(v))}.reduce(:+)
-      r.flushall
-      result
     end
 
-    def pll_norm(ids)
-      # t = Time.now
-      r = Redis.new
-      hash_name = Random.rand(20000000000).to_s
+    def pll_norm(ids, hash_name)
       ids.each_slice(BATCH) do |slice|
         Resque.enqueue(NormWorker, slice, hash_name)
       end
-
-      while Resque.size(:mut_count)!= 0 do
-        sleep 5
-      end
-
-      sleep 18
-
-      # puts 'Done in: ' + (Time.now - t).round(0).to_s + 's'
-
-      result = r.hvals(hash_name).map{|v| SynCount.from_h(JSON.parse(v))}.reduce(:+)
-      r.flushall
-      result
     end
 
   end

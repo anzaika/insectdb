@@ -32,10 +32,9 @@ class Segment < ActiveRecord::Base
 
   # Public: Set ref_seq for every segment in the database
   def self.set_ref_seq
-    Parallel.each(Segment.all, :in_processes => 8) do |m|
-      m.ref_seq
+    Segment.all.pluck(:id).each_slice(100) do |slice|
+      Resque.enqueue(SegmentWorker, slice)
     end
-    true
   end
 
   # Public: Return all SNPs for this segment.
@@ -94,11 +93,6 @@ class Segment < ActiveRecord::Base
     _ref_seq || set_ref_seq
   end
 
-  def set_ref_seq
-    Seq.dmel_seq(chromosome: chromosome, start: start, stop: stop)
-       .tap{|seq| update_attribute('_ref_seq', seq)}
-  end
-
   # Public: return the GC content at the third positions of codons
   #         of this segment.
   #
@@ -112,6 +106,11 @@ class Segment < ActiveRecord::Base
 
   def set_length
     self.length = stop - start + 1
+  end
+
+  def set_ref_seq
+    Seq.dmel_seq(chromosome: chromosome, start: start, stop: stop)
+       .tap{|seq| update_attribute('_ref_seq', seq)}
   end
 
 end
