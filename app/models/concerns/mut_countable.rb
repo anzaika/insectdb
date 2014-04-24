@@ -23,7 +23,7 @@ module MutCountable
 
   module ClassMethods
 
-    BATCH = 300
+    BATCH = 900
 
     def alpha_for(segments, **snp_params)
       alpha_processor(segments, **snp_params)

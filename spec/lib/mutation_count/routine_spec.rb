@@ -7,6 +7,7 @@ describe '.pn_ps' do
     context 'for segment with sequence ATGGCC starting at 3' do
       context 'with snps TC at 4 and CG at 7' do
         it 'returns {syn: 0.0, nonsyn: 2.0}' do
+          pending
           seq = build(:sequence, start: 3, seq: 'ATGGCC')
           seg = create(:segment, seq: seq)
 
@@ -26,6 +27,7 @@ describe '.pn_ps' do
     context 'for segment with sequence GGCCAT starting at 4' do
       context 'with snps AG at 5 and CG at 8' do
         it 'returns {syn: 0.0, nonsyn: 2.0}' do
+          pending
           seq = build(:sequence, start: 4, seq: 'GGCCAT')
           seg = create(:segment, seq: seq)
 

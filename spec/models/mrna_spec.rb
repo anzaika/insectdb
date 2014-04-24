@@ -67,6 +67,30 @@ describe Mrna do
         end
       end
 
+      context "with two segments 1,6 ATGCCC and 9,15 TAACTGA" do
+
+        let(:seq1){build(:sequence, start: 1, seq: 'ATGCCC')}
+        let(:seq2){build(:sequence, start: 9, seq: 'TAACTGA')}
+        let(:mrna){create(:mrna_with_two_segments, seq1: seq1, seq2: seq2)}
+
+        it "returns a Sequence ATGCCCTAA" do
+          mrna.ref_seq.sseq.should == 'ATGCCCTAA'
+        end
+
+      end
+
+      context "with two segments 1,ATGCCC and 9,TCGTAACTTTGA" do
+
+        let(:seq1){build(:sequence, start: 1, seq: 'ATGCCC')}
+        let(:seq2){build(:sequence, start: 9, seq: 'TCGTAACTTTGA')}
+        let(:mrna){create(:mrna_with_two_segments, seq1: seq1, seq2: seq2)}
+
+        it "returns a Sequence ATGCCCTAA" do
+          mrna.ref_seq.sseq.should == 'ATGCCCTCGTAA'
+        end
+
+      end
+
       context "with two segments 1,6 CTGCCC and 9,11 TAA" do
 
         let(:seq1){build(:sequence, start: 1, seq: 'CTGCCC')}

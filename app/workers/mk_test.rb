@@ -43,15 +43,15 @@ class MkTest
 
   def execute_results_for_chr(snp_params, chr)
     render_head(snp_params, chr)
-    alt   = Segment.alpha_for(Segment.alt.where(chromosome: chr).first(100), **snp_params)
-    const = Segment.alpha_for(Segment.const.where(chromosome: chr).first(100), **snp_params)
+    alt   = Segment.alpha_for(Segment.alt.where(chromosome: chr), **snp_params)
+    const = Segment.alpha_for(Segment.const.where(chromosome: chr), **snp_params)
     render_table(alt, const)
   end
 
   def execute_results(snp_params)
     render_head(snp_params)
-    alt   = Segment.alpha_for(Segment.alt.first(100), **snp_params)
-    const = Segment.alpha_for(Segment.const.first(100), **snp_params)
+    alt   = Segment.alpha_for(Segment.alt, **snp_params)
+    const = Segment.alpha_for(Segment.const, **snp_params)
     render_table(alt, const)
   end
 

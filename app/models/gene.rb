@@ -1,4 +1,3 @@
 class Gene < ActiveRecord::Base
-  validates :flybase_id,
-            :presence => true
+  has_and_belongs_to_many :mrnas
 end

@@ -12,11 +12,11 @@ module SeedFourthStage
     SEPARATOR = ';'
 
     def run
-      # segments
-      # mrnas
-      # genes
-      # mrnas_segments
-      # genes_mrnas
+      segments
+      mrnas
+      genes
+      mrnas_segments
+      genes_mrnas
       incl_changes
       segment_gain
       puts '### Seed stage 4 complete'

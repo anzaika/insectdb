@@ -35,6 +35,9 @@ class Segment < ActiveRecord::Base
     Segment.all.pluck(:id).each_slice(100) do |slice|
       Resque.enqueue(SegmentWorker, slice)
     end
+    while Resque.size(:all) != 0 || Resque.info[:working] != 0 do
+      sleep 10
+    end
   end
 
   # Public: Return all SNPs for this segment.

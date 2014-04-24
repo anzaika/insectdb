@@ -2,7 +2,8 @@ class Mrna < ActiveRecord::Base
   include Constants
   serialize :_ref_seq
 
-  has_and_belongs_to_many :segments
+  has_and_belongs_to_many :segments, -> {order "start ASC"}
+  has_and_belongs_to_many :genes
 
   scope :correct, -> {where(:quality_good => true)}
 
@@ -23,10 +24,22 @@ class Mrna < ActiveRecord::Base
             :presence => true,
             :inclusion => { :in => %W[ + - ] }
 
+  def self.clear_ref_seq
+    Mrna.all.pluck(:id).each_slice(100) do |slice|
+      Resque.enqueue(MrnaClearRefSeqWorker, slice)
+    end
+    while Resque.size(:all) != 0 || Resque.info[:working] != 0 do
+      sleep 10
+    end
+  end
+
   # Public: Set ref_seq for every mRNA in the database
   def self.set_ref_seq
     Mrna.all.pluck(:id).each_slice(100) do |slice|
       Resque.enqueue(MrnaWorker, slice)
+    end
+    while Resque.size(:all) != 0 || Resque.info[:working] != 0 do
+      sleep 10
     end
   end
 
@@ -59,7 +72,7 @@ class Mrna < ActiveRecord::Base
 
   def set_ref_seq
     seq = cut_till_start_codon(assemble_ref_seq)
-    seq = cut_till_stop_codon(seq)
+    seq = cut_after_stop_codon(seq)
     errors = check(seq)
     if errors.empty?
       update_attributes(_ref_seq: seq, good_quality: true)
@@ -78,11 +91,14 @@ class Mrna < ActiveRecord::Base
   def assemble_ref_seq
     seq =
       segments
-        .coding
         .map(&:ref_seq)
         .reduce(:+)
 
     positive? ? seq : seq.complement
+  end
+
+  def tail_segment_length
+    segments[positive? ? -1 : 0].length
   end
 
   def cut_till_start_codon(seq)
@@ -92,11 +108,15 @@ class Mrna < ActiveRecord::Base
     seq
   end
 
-  def cut_till_stop_codon(seq)
-    while seq.length > 5 and !Codon.stop_codon?(seq.sseq[-3,3]) do
-      seq.pop
+  def cut_after_stop_codon(seq)
+    stop_codon_start = 0
+
+    while stop_codon_start < seq.length-3 and
+          !Codon.stop_codon?(seq.sseq[stop_codon_start, 3]) do
+      stop_codon_start+=3
     end
-    seq
+
+    Sequence.new(seq.seq[0, stop_codon_start+3])
   end
 
 end
