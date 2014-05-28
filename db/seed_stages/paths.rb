@@ -11,6 +11,7 @@ module Insectdb
     :mrnas            => ANN_ROOT   + 'mrna',
     :genes            => ANN_ROOT   + 'gene',
     :genes_mrnas      => ANN_ROOT   + 'genes_mrnas',
-    :mrnas_segments   => ANN_ROOT   + 'mrnas_segments'
+    :mrnas_segments   => ANN_ROOT   + 'mrnas_segments',
+    :gene_data        => ANN_ROOT   + 'gene_data'
   }
 end

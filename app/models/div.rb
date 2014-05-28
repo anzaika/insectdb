@@ -72,4 +72,10 @@ class Div < ActiveRecord::Base
     !hash.values.include?('N')
   end
 
+  def self.simpler__position_is_divergent?( hash )
+    (hash[:dmel] != hash[:dyak]) &&
+    (hash[:dmel] != 'N') &&
+    (hash[:dyak] != 'N')
+  end
+
 end

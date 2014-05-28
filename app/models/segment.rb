@@ -43,25 +43,15 @@ class Segment < ActiveRecord::Base
   # Public: Return all SNPs for this segment.
   #
   # Returns ActiveRecord::Relation.
-  def snps(sig_count: 150, aaf: 0.5, age: :all, singletons: :exclude)
-    if age == :all
+  def snps(sig_count: 150, aaf: 0.85, fixed_aaf: false)
+    if fixed_aaf
       result =
-        Snp.where("chromosome = ? and sig_count >= ? and position between ? and ?",
-                  chromosome, sig_count, start, stop)
-    elsif age == :old
-      result =
-        Snp.where("chromosome = ? and sig_count >= ? and aaf < ? and position between ? and ?",
-                  chromosome, sig_count, aaf, start, stop)
-    elsif age == :new
-      result =
-        Snp.where("chromosome = ? and sig_count >= ? and aaf >= ? and position between ? and ?",
-                  chromosome, sig_count, aaf, start, stop)
+        Snp.where("chromosome = ? and sig_count >= ? and aaf between ? and ? and position between ? and ?",
+                   chromosome, sig_count, aaf, aaf+0.02, start, stop)
     else
-      raise 'Unknown age passed: ' + age.to_s
-    end
-
-    if singletons == :exclude
-       result = result.select{|s| !s.alleles.values.include?(1) }
+      result =
+        Snp.where("chromosome = ? and sig_count >= ? and aaf <= ? and position between ? and ?",
+                  chromosome, sig_count, aaf, start, stop)
     end
 
     result

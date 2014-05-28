@@ -1,13 +1,13 @@
 source 'https://rubygems.org'
 
-gem 'rails', '4.1.0.rc1'
+gem 'rails', '4.1.0'
 gem 'unicorn'
 gem 'pg'
 
-gem 'sass-rails', '~> 4.0.1'
+gem 'sass-rails'
 gem 'haml'
-gem 'uglifier', '>= 1.3.0'
-gem 'coffee-rails', '~> 4.0.0'
+gem 'uglifier'
+gem 'coffee-rails'
 gem 'therubyracer',  platforms: :ruby
 gem 'jquery-rails'
 gem 'turbolinks'
@@ -16,10 +16,10 @@ gem 'jbuilder', '~> 2.0'
 
 gem 'sdoc', '~> 0.4.0',          group: :doc
 
-gem 'capistrano', '~> 3.0.1'
-gem 'capistrano-rails', '~> 1.1.0'
+gem 'capistrano'
+gem 'capistrano-rails'
 gem 'capistrano-bundler'
-gem 'capistrano-rbenv', '~> 2.0'
+gem 'capistrano-rbenv'
 
 group :development, :test do
   gem 'map_by_method'
@@ -37,6 +37,5 @@ end
 
 
 gem 'bio'
-# gem "resque", "~> 2.0.0.pre.1", github: "resque/resque"
 gem 'resque'
 gem 'redis'

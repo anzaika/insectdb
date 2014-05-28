@@ -25,6 +25,14 @@ module MutCountable
 
     BATCH = 900
 
+    def asymptotic_alpha_for(segments)
+      param = {fixed_aaf: true}
+
+      (0..1).step(0.02).map{|v| v.round(2)}.map do |v|
+        alpha_for(segments, param.merge({aaf: v}))
+      end
+    end
+
     def alpha_for(segments, **snp_params)
       alpha_processor(segments, **snp_params)
     end
@@ -62,6 +70,23 @@ module MutCountable
         alpha: alpha,
         snps: segments.map{|s| s.snps(snp_params).count}.reduce(:+),
         divs: segments.map{|s| s.divs.count}.reduce(:+)
+      }
+
+    rescue
+      return {
+        pnn: '-',
+        pn: '-',
+        psn: '-',
+        ps: '-',
+        dnn: '-',
+        dn: '-',
+        dsn: '-',
+        ds: '-',
+        ns: '-',
+        nn: '-',
+        alpha: '-',
+        snps: '-',
+        divs: '-'
       }
     end
 
