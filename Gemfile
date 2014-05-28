@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'rails', '4.1.0'
+gem 'rails'
 gem 'unicorn'
 gem 'pg'
 
@@ -12,7 +12,7 @@ gem 'therubyracer',  platforms: :ruby
 gem 'jquery-rails'
 gem 'turbolinks'
 
-gem 'jbuilder', '~> 2.0'
+gem 'jbuilder'
 
 gem 'sdoc', '~> 0.4.0',          group: :doc
 
@@ -34,7 +34,6 @@ group :development, :test do
   gem 'ruby-prof'
   gem 'database_cleaner'
 end
-
 
 gem 'bio'
 gem 'resque'
