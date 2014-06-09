@@ -91,6 +91,7 @@ class Mrna < ActiveRecord::Base
   def assemble_ref_seq
     seq =
       segments
+        .coding
         .map(&:ref_seq)
         .reduce(:+)
 

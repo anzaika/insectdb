@@ -45,7 +45,7 @@ class Snp < ActiveRecord::Base
     allele_freqs = poly_sig.inject(Hash.new(0)){|mem, var| mem[var]+=1; mem}
 
     self.create!(
-      :chromosome => CHROMOSOMES[chr],
+      :chromosome => chr,
       :position   => pos,
       :sig_count  => poly_sig.count,
       :alleles    => allele_freqs,
@@ -55,10 +55,16 @@ class Snp < ActiveRecord::Base
 
   # Public: Compute ancestral allele frequency (aaf)
   def self.aaf_from(freqs, ref)
-    dmel_count = freqs[ref[:dmel]].to_f
-    all_count  = freqs.values.reduce(:+)
+    ref = (ref[:dsim] == ref[:dyak]) ? ref[:dsim] : 'N'
 
-    (dmel_count/all_count).round(3)
+    if ref != 'N'
+      dmel_count = freqs[ref].to_f
+      all_count  = freqs.values.reduce(:+)
+
+      return (dmel_count/all_count).round(3)
+    else
+      return nil
+    end
   end
 
   # Public: When parsing 163 aligned Drosophila melanogaster sequences column
@@ -81,7 +87,8 @@ class Snp < ActiveRecord::Base
   #
   # Returns The Boolean.
   def self.column_is_polymorphic?( col )
-    col.select{ |n| %W[A C G T].include?(n) }.uniq.size > 1
+    result = col.select{ |n| %W[A C G T].include?(n) }.uniq.size > 1
+    col.count{|n| n == 'N'} > 50 ? nil : result
   end
 
 end

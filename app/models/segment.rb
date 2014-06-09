@@ -30,9 +30,18 @@ class Segment < ActiveRecord::Base
 
   before_create :set_length
 
+  def self.clear_ref_seq
+    Segment.all.pluck(:id).each_slice(100) do |slice|
+      Resque.enqueue(SegmentClearRefSeqWorker, slice)
+    end
+    while Resque.size(:all) != 0 || Resque.info[:working] != 0 do
+      sleep 10
+    end
+  end
+
   # Public: Set ref_seq for every segment in the database
   def self.set_ref_seq
-    Segment.all.pluck(:id).each_slice(100) do |slice|
+    Segment.coding.pluck(:id).each_slice(300) do |slice|
       Resque.enqueue(SegmentWorker, slice)
     end
     while Resque.size(:all) != 0 || Resque.info[:working] != 0 do
@@ -40,21 +49,22 @@ class Segment < ActiveRecord::Base
     end
   end
 
+  def positions
+    (start..stop).to_a
+  end
+
   # Public: Return all SNPs for this segment.
   #
   # Returns ActiveRecord::Relation.
-  def snps(sig_count: 150, aaf: 0.85, fixed_aaf: false)
-    if fixed_aaf
-      result =
-        Snp.where("chromosome = ? and sig_count >= ? and aaf between ? and ? and position between ? and ?",
-                   chromosome, sig_count, aaf, aaf+0.02, start, stop)
-    else
-      result =
-        Snp.where("chromosome = ? and sig_count >= ? and aaf <= ? and position between ? and ?",
-                  chromosome, sig_count, aaf, start, stop)
-    end
+  def snps
+    Snp.where("chromosome = ? and sig_count >= ? and aaf <= ? and position between ? and ?",
+              chromosome, 145, 0.85, start, stop)
+       .select{ |s| !s.alleles.values.include?(1) }
+  end
 
-    result
+  def snps_all
+    Snp.where("chromosome = ? and sig_count >= 145 and position between ? and ?",
+              chromosome, start, stop)
   end
 
   # Public: Return all divs for this segment.
@@ -102,7 +112,7 @@ class Segment < ActiveRecord::Base
   end
 
   def set_ref_seq
-    Seq.dmel_seq(chromosome: chromosome, start: start, stop: stop)
+    Seq.ref_seq(chromosome: chromosome, start: start, stop: stop)
        .tap{|seq| update_attribute('_ref_seq', seq)}
   end
 

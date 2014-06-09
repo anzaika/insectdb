@@ -3,19 +3,19 @@
 module MutCountable
   extend ActiveSupport::Concern
 
-  def pn_ps(method: 'ermakova', **params)
+  def pn_ps(method)
     MutationCount::Routine
       .new(segment: self, method: method)
-      .pn_ps(params)
+      .pn_ps
   end
 
-  def dn_ds(method: 'ermakova')
+  def dn_ds(method)
     MutationCount::Routine
       .new(segment: self, method: method)
       .dn_ds
   end
 
-  def norm(method: 'ermakova')
+  def norm(method)
     MutationCount::Routine
       .new(segment: self, method: method)
       .norm
@@ -25,23 +25,15 @@ module MutCountable
 
     BATCH = 900
 
-    def asymptotic_alpha_for(segments)
-      param = {fixed_aaf: true}
-
-      (0..1).step(0.02).map{|v| v.round(2)}.map do |v|
-        alpha_for(segments, param.merge({aaf: v}))
-      end
+    def alpha_for(segments, method)
+      alpha_processor(segments, method)
     end
 
-    def alpha_for(segments, **snp_params)
-      alpha_processor(segments, **snp_params)
-    end
-
-    def alpha_processor(segments, **snp_params)
+    def alpha_processor(segments, method)
 
       ids = segments.map(&:id)
 
-      pll_map(ids, snp_params)
+      pll_map(ids, method)
       result = pll_reduce
 
       p = result[:p]
@@ -68,7 +60,7 @@ module MutCountable
         ns: (n.s).round(0),
         nn: (n.n).round(0),
         alpha: alpha,
-        snps: segments.map{|s| s.snps(snp_params).count}.reduce(:+),
+        snps: segments.map{|s| s.snps.count}.reduce(:+),
         divs: segments.map{|s| s.divs.count}.reduce(:+)
       }
 
@@ -94,12 +86,12 @@ module MutCountable
       ActiveRecord::Base.connection.reconnect!
     end
 
-    def pll_map(ids, snp_params)
+    def pll_map(ids, method)
       r = Redis.new
       ['p','d','n'].map{|k| r.del(k)}
-      pll_pn_ps(ids, 'p', snp_params)
-      pll_dn_ds(ids, 'd')
-      pll_norm( ids, 'n')
+      pll_pn_ps(ids, 'p', method)
+      pll_dn_ds(ids, 'd', method)
+      pll_norm( ids, 'n', method)
     end
 
     def pll_reduce
@@ -116,21 +108,21 @@ module MutCountable
       }
     end
 
-    def pll_pn_ps(ids, hash_name, snp_params)
+    def pll_pn_ps(ids, hash_name, method)
       ids.each_slice(BATCH) do |slice|
-        Resque.enqueue(PnPsWorker, slice, hash_name, snp_params)
+        Resque.enqueue(PnPsWorker, slice, hash_name, method)
       end
     end
 
-    def pll_dn_ds(ids, hash_name)
+    def pll_dn_ds(ids, hash_name, method)
       ids.each_slice(BATCH) do |slice|
-        Resque.enqueue(DnDsWorker, slice, hash_name)
+        Resque.enqueue(DnDsWorker, slice, hash_name, method)
       end
     end
 
-    def pll_norm(ids, hash_name)
+    def pll_norm(ids, hash_name, method)
       ids.each_slice(BATCH) do |slice|
-        Resque.enqueue(NormWorker, slice, hash_name)
+        Resque.enqueue(NormWorker, slice, hash_name, method)
       end
     end
 

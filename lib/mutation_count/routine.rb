@@ -1,14 +1,14 @@
 module MutationCount
 class Routine
 
-  def initialize(segment: segment, method: 'leushkin')
+  def initialize(segment: segment, method: method)
     @segment = segment
     @codons  = segment.codons
     @method  = method
   end
 
-  def pn_ps(params)
-    return SynCount.new if @codons.empty? || snps(params).empty?
+  def pn_ps
+    return SynCount.new if @codons.empty? || snps.empty?
     build_mutcount(snps)
   end
 
@@ -56,8 +56,8 @@ class Routine
     .run
   end
 
-  def snps(params={})
-    @snps ||= @segment.snps(params).map{|m| m.to_mutation(negative_strand?)}
+  def snps
+    @snps ||= @segment.snps.map{|m| m.to_mutation(negative_strand?)}
   end
 
   def divs

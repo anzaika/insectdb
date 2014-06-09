@@ -29,7 +29,7 @@ class Div < ActiveRecord::Base
   def self.from_hash( ref: ref, chr: chr, pos: pos)
 
     self.create!(
-      :chromosome => CHROMOSOMES[chr],
+      :chromosome => chr,
       :position   => pos,
       :alleles    => ref
     )

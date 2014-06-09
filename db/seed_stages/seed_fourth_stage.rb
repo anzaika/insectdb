@@ -19,6 +19,7 @@ module SeedFourthStage
       genes_mrnas
       incl_changes
       segment_gain
+      gene_data
       puts '### Seed stage 4 complete'
     end
 
@@ -85,6 +86,13 @@ module SeedFourthStage
       _exec_and_format(:gain) do |l|
         s = Segment.find(l[2].to_i)
         s.update_attribute('segment_gain', l[8])
+      end
+    end
+
+    def gene_data
+      _exec_and_format(:gene_data) do |l|
+        s = Gene.where("flybase_id = ?", l[0]).first
+        s.update_attributes('orthology_pattern' => l[1], 'expression_pattern' => l[2])
       end
     end
 

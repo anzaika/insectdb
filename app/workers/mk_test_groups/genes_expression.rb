@@ -1,39 +1,26 @@
 class MkTestGroups::GenesExpression
   include Constants
 
-  def perform
-    without_singletons
-    with_singletons
-  end
-
-  def without_singletons
-    base = {sig_count: 145, singletons: :exclude}
-    execute_results(base.merge({age: :all}))
-  end
-
-  def with_singletons
-    base = {sig_count: 145, singletons: :include}
-    execute_results(base.merge({age: :all}))
-  end
-
-  private
-
-  def execute_results(snp_params)
-    render_head(snp_params)
-    data =
+  def perform(method)
+    base_data =
       [
-        Segment.alpha_for(Gene.exp_all.map{|g| g.segments.coding}.flatten, **snp_params).merge({type: 'all'}),
-        Segment.alpha_for(Gene.exp_up.map{|g| g.segments.coding}.flatten, **snp_params).merge({type: 'up'}),
-        Segment.alpha_for(Gene.exp_down.map{|g| g.segments.coding}.flatten, **snp_params).merge({type: 'down'}),
-        Segment.alpha_for(Gene.exp_same.map{|g| g.segments.coding}.flatten, **snp_params).merge({type: 'same'})
+        Gene.exp_all,
+        Gene.exp_up,
+        Gene.exp_down,
+        Gene.exp_same
       ]
-    render_table(data)
-  end
 
-  def render_head(snp_params, chr=nil)
-    string = snp_params.to_a.map{|a| a.join(": ")}.join(", ")
-    string << " -- for chromosome #{chr}" if chr
-    puts "### " + string
+    data =
+      base_data
+        .map { |genes|    genes.map{|g| g.segments.coding.uniq}.flatten  }
+        .map { |segments| Segment.alpha_for(segments, method)            }
+
+    data[0] = data[0].merge({type: 'all'})
+    data[1] = data[1].merge({type: 'up'})
+    data[2] = data[2].merge({type: 'down'})
+    data[3] = data[3].merge({type: 'same'})
+
+    render_table(data)
   end
 
   def render_table(data)

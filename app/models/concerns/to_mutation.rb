@@ -1,7 +1,7 @@
 module ToMutation
   extend ActiveSupport::Concern
 
-  def to_mutation(concatenate=false)
+  def to_mutation(complement=false)
     case self.class.name
     when 'Div'
       alls = [alleles[:dmel], alleles[:dsim]]
@@ -11,7 +11,7 @@ module ToMutation
 
     Mutation.new(
       pos:     position,
-      alleles: (concatenate ? comp_alleles(alls) : alls)
+      alleles: (complement ? comp_alleles(alls) : alls)
     )
   end
 
