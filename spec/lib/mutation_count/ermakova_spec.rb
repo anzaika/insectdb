@@ -7,6 +7,7 @@ describe '.run' do
     let(:codon) {build(:codon, start: 4, seq: 'ATG')}
 
     context 'and mutation AT at 5' do
+
       it 'returns {syn: 0.0, nonsyn: 1.0}' do
         mut1 = build(:mutation, pos: 5, alleles: ['A','T'])
         muts = [mut1]
@@ -46,11 +47,6 @@ describe '.run' do
 
       end
     end
-
-    context 'and mutations AT at 4 and GT at 10' do
-      it 'returns {syn: 0.0, nonsyn: 1.0}'
-    end
-
   end
 
   context 'for codon CGT with start at 4' do
